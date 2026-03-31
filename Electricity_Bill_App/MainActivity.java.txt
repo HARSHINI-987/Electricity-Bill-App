@@ -1,0 +1,80 @@
+package com.example.electricitybill;
+
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etName, etUnits, etRate, etMobile;
+    TextView tvResult;
+    Button btnGenerate, btnClear;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etName = findViewById(R.id.etName);
+        etUnits = findViewById(R.id.etUnits);
+        etRate = findViewById(R.id.etRate);
+        etMobile = findViewById(R.id.etMobile);
+        tvResult = findViewById(R.id.tvResult);
+
+        btnGenerate = findViewById(R.id.btnGenerate);
+        btnClear = findViewById(R.id.btnClear);
+
+        btnGenerate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String name = etName.getText().toString();
+                String mobile = etMobile.getText().toString();
+
+                int units = Integer.parseInt(etUnits.getText().toString());
+                double rate = Double.parseDouble(etRate.getText().toString());
+
+                double energyCharge = units * rate;
+                double fixedCharge = 250;
+                double duty = energyCharge * 0.09;
+                double total = energyCharge + fixedCharge + duty;
+
+                String bill = "Customer: " + name + "\n" +
+                        "----------------------\n" +
+                        "Units: " + units + "\n" +
+                        "Energy Charge: ₹" + energyCharge + "\n" +
+                        "Fixed Charge: ₹" + fixedCharge + "\n" +
+                        "Electricity Duty (9%): ₹" + duty + "\n" +
+                        "----------------------\n" +
+                        "Total Bill: ₹" + total;
+
+                tvResult.setText(bill);
+
+                // SMS Message
+                String sms = "Dear " + name + ", Your electricity bill is ₹" + total +
+                        ". Please pay before due date.";
+
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("sms:" + mobile));
+                intent.putExtra("sms_body", sms);
+                startActivity(intent);
+            }
+        });
+
+        btnClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                etName.setText("");
+                etUnits.setText("");
+                etRate.setText("");
+                etMobile.setText("");
+                tvResult.setText("");
+            }
+        });
+    }
+}
